@@ -7,22 +7,20 @@ const PasswordLengthSlider = ({ length, setLength }) => {
   const bgColor = `linear-gradient(90deg, #48BB78 ${percentage}%, #2D3748 ${percentage}%)`;
 
   return (
-    <div className="">
-      <div className="mt-2">
-        <input
-          id="inputRange"
-          type="range"
-          min={8}
-          max={32}
-          value={length}
-          onChange={(e) => setLength(parseInt(e.target.value, 10))}
-          className="appearance-none w-full h-2 rounded-full outline-none"
-          style={{ background: bgColor }}
-        />
-      </div>
+    <div className="mt-2">
+      <input
+        id="inputRange"
+        type="range"
+        min={8}
+        max={window.innerWidth < 700 ? 20 : 32}
+        value={length}
+        onChange={(e) => setLength(parseInt(e.target.value, 10))}
+        className="w-full h-2 rounded-full outline-none"
+        style={{ background: bgColor }}
+      />
       <label
         htmlFor="inputRange"
-        className="text-md font-bold text-green-200 mr-1"
+        className="text-md font-bold text-green-200 block mt-2"
       >
         Length : {length}
       </label>
@@ -47,73 +45,70 @@ const Generator = ({
   }, [password]);
 
   return (
-    <div className="flex flex-col justify-center items-center bg-emerald-700 w-2/3 h-1/2">
-      <div>
-        <h1 className="text-4xl text-white font-bold mb-2">
-          Password Generator
-        </h1>
-      </div>
-      <div className="flex items-center justify-center p-2 w-full">
-        <div className="rounded-lg bg-gray-200 p-2 w-1/2">
-          <div className="flex ">
-            <input
-              type="text"
-              value={password}
-              readOnly
-              className=" w-full rounded-tl-lg rounded-bl-lg bg-white pl-2 text-base font-semibold outline-0"
-              ref={passwordRef}
-            />
-            <button
-              onClick={copyPasstoClipboard}
-              className="bg-blue-500 p-2 rounded-tr-lg rounded-br-lg text-white font-semibold hover:bg-blue-800 transition-colors"
-            >
-              Copy
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col">
-        <PasswordLengthSlider length={length} setLength={setLength} />
-        <div>
-          <div className="flex my-1 items-center justify-between">
-            <label
-              className="text-md font-bold text-green-200 mr-1"
-              htmlFor="number"
-            >
-              Add Numbers
-            </label>
-            <input
-              className="dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 w-8 h-8"
-              type="checkbox"
-              defaultChecked={numberPerm}
-              name="NumberAddition"
-              id="number"
-              onClick={() => {
-                setNumberPerm((prev) => !prev);
-              }}
-            />
-          </div>
 
-          <div className="flex my-1 items-center justify-between">
-            <label
-              className="text-md font-bold text-green-200 mr-1"
-              htmlFor="specialChar"
-            >
-              Add Special Characters
-            </label>
-            <input
-              className="dark:border-white-400/20 dark:scale-100 transition-all duration-500 ease-in-out dark:hover:scale-110 dark:checked:scale-100 w-8 h-8"
-              type="checkbox"
-              name="specialcharacter"
-              id="specialChar"
-              defaultChecked={specialCharPerm}
-              onClick={() => {
-                setSpecialCharPerm((prev) => !prev);
-              }}
-            />
-          </div>
+    <div className="bg-emerald-700 flex flex-col justify-center items-center p-4 h-4/6 sm:w-10/12">
+      
+    <div className="bg-emerald-700 ">
+      <div className="rounded-lg bg-gray-200 p-2 w-full mb-4">
+        <div className="flex">
+          <input
+            type="text"
+            value={password}
+            readOnly
+            className="w-full rounded-l-lg bg-white pl-2 text-base font-semibold outline-0"
+            ref={passwordRef}
+          />
+          <button
+            onClick={copyPasstoClipboard}
+            className="bg-blue-500 p-2 rounded-r-lg text-white font-semibold hover:bg-blue-800 transition-colors"
+          >
+            Copy
+          </button>
         </div>
       </div>
+      <div className="w-full mb-4">
+        <PasswordLengthSlider length={length} setLength={setLength} />
+      </div>
+      <div className="flex flex-col w-full">
+        <div className="flex my-1 items-center justify-between">
+          <label
+            className="text-md font-bold text-green-200 mr-1"
+            htmlFor="number"
+          >
+            Add Numbers
+          </label>
+          <input
+            className="w-8 h-8"
+            type="checkbox"
+            defaultChecked={numberPerm}
+            name="NumberAddition"
+            id="number"
+            onClick={() => {
+              setNumberPerm((prev) => !prev);
+            }}
+          />
+        </div>
+
+        <div className="flex my-1 items-center justify-between">
+          <label
+            className="text-md font-bold text-green-200 mr-1"
+            htmlFor="specialChar"
+          >
+            Add Special Characters
+          </label>
+          <input
+            className="w-8 h-8"
+            type="checkbox"
+            name="specialcharacter"
+            id="specialChar"
+            defaultChecked={specialCharPerm}
+            onClick={() => {
+              setSpecialCharPerm((prev) => !prev);
+            }}
+          />
+        </div>
+      </div>
+    </div>
     </div>
   );
 };

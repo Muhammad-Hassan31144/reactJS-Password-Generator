@@ -44,7 +44,11 @@ function App() {
     passwordGen();
   }, [passwordGen]);
   return (
-    <div className="h-screen w-full bg-green-300 flex justify-center items-center border border-indigo-800">
+    <div className="h-screen w-full bg-green-300 flex flex-col justify-normal md:justify-center items-center border border-indigo-800">
+   
+    <h1 className="text-2xl md:text-4xl text-white text-left font-bold m-2 p-2 md:m-4 md:p-4">
+      Password Generator
+    </h1>
       <Generator
         password={password}
         length={length}

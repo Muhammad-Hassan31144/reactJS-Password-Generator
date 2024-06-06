@@ -28,7 +28,11 @@ const Button = ({ onClick, isGenerating }) => {
 
     return () => clearInterval(tipInterval);
   }, [tips.length]);
-
+  useEffect(() => {
+    if (triggerScramble) {
+      scramble();
+    }
+  }, [triggerScramble]);
   const scramble = () => {
     let pos = 0;
     intervalRef.current = setInterval(() => {

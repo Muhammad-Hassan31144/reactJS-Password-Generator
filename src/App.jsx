@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import Generator from "./components/Generator";
 import Header from "./components/Header";
+import TitleChange from "./components/TitleChange";
 
 function App() {
   const [length, setLength] = useState(12);
@@ -60,6 +61,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full bg-green-300 flex flex-col justify-normal items-center border border-indigo-800 p-4">
+      <TitleChange />
       <Header />
       <div className="flex flex-col justify-center items-center w-full md:w-2/3 mt-8">
         

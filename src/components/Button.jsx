@@ -20,7 +20,7 @@ const Button = ({ onClick, isGenerating }) => {
   const intervalRef = useRef(null);
   const [text, setText] = useState(TARGET_TEXT);
   const [currentTip, setCurrentTip] = useState(0);
-
+  const [triggerScramble, setTriggerScramble] = useState(false);
   useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTip((prevTip) => (prevTip + 1) % tips.length);

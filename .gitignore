@@ -13,6 +13,8 @@ dist-ssr
 *.local
 
 src/components/RandomSource.jsx
+src/components/SecurityTips.jsx
+src/components/PasswordEvaluation.jsx
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

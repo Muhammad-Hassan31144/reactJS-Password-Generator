@@ -1,13 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Generator from "./components/Generator";
-import SecurityTips from "./components/SecurityTips";
-import PasswordEvaluation from "./components/PasswordEvaluation";
 
 function App() {
   const [length, setLength] = useState(12);
   const [numberPerm, setNumberPerm] = useState(false);
   const [specialcharPerm, setSpecialCharPerm] = useState(false);
   const [password, setPassword] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const getRandomValue = (max) => {
     if (window.crypto) {
@@ -50,11 +49,13 @@ function App() {
     }
 
     setPassword(pass);
-  }, [length, numberPerm, specialcharPerm, setPassword]);
+    setIsGenerating(false);
+  }, [length, numberPerm, specialcharPerm]);
 
-  useEffect(() => {
-    passwordGen();
-  }, [passwordGen]);
+  const handleGeneratePassword = () => {
+    setIsGenerating(true);
+    setTimeout(passwordGen, Math.floor(Math.random() * 2000) + 1000); // 1-3 second delay
+  };
 
   return (
     <div className="h-screen w-full bg-green-300 flex flex-col justify-normal md:flex-row md:justify-center items-center border border-indigo-800 p-4">
@@ -70,12 +71,11 @@ function App() {
           setLength={setLength}
           setNumberPerm={setNumberPerm}
           setSpecialCharPerm={setSpecialCharPerm}
+          isGenerating={isGenerating}
+          handleGeneratePassword={handleGeneratePassword}
         />
-        <PasswordEvaluation password={password} />
       </div>
-      <div className="w-full md:w-1/3 mt-4 md:mt-0">
-        <SecurityTips />
-      </div>
+      
     </div>
   );
 }

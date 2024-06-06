@@ -1,10 +1,22 @@
 import { useState, useCallback, useEffect } from "react";
 import Generator from "./components/Generator";
+import SecurityTips from "./components/SecurityTips";
+import PasswordEvaluation from "./components/PasswordEvaluation";
+
 function App() {
-  const [length, setLength] = useState(8);
+  const [length, setLength] = useState(12);
   const [numberPerm, setNumberPerm] = useState(false);
   const [specialcharPerm, setSpecialCharPerm] = useState(false);
   const [password, setPassword] = useState("");
+
+  const getRandomValue = (max) => {
+    if (window.crypto) {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] % max;
+    }
+    return Math.floor(Math.random() * max);
+  };
 
   const passwordGen = useCallback(() => {
     let pass = "";
@@ -16,7 +28,7 @@ function App() {
     const shuffleString = (input) => {
       const array = input.split("");
       for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = getRandomValue(i + 1);
         [array[i], array[j]] = [array[j], array[i]];
       }
       return array.join("");
@@ -33,7 +45,7 @@ function App() {
 
     // Generate password
     for (let i = 0; i < length; i++) {
-      let random_char = Math.floor(Math.random() * str.length);
+      let random_char = getRandomValue(str.length);
       pass += str.charAt(random_char);
     }
 
@@ -43,21 +55,27 @@ function App() {
   useEffect(() => {
     passwordGen();
   }, [passwordGen]);
+
   return (
-    <div className="h-screen w-full bg-green-300 flex flex-col justify-normal md:justify-center items-center border border-indigo-800">
-   
-    <h1 className="text-2xl md:text-4xl text-white text-left font-bold m-2 p-2 md:m-4 md:p-4">
-      Password Generator
-    </h1>
-      <Generator
-        password={password}
-        length={length}
-        numberPerm={numberPerm}
-        specialcharPerm={specialcharPerm}
-        setLength={setLength}
-        setNumberPerm={setNumberPerm}
-        setSpecialCharPerm={setSpecialCharPerm}
-      />
+    <div className="h-screen w-full bg-green-300 flex flex-col justify-normal md:flex-row md:justify-center items-center border border-indigo-800 p-4">
+      <div className="flex flex-col justify-center items-center w-full md:w-2/3">
+        <h1 className="text-2xl md:text-4xl text-white text-left font-bold m-2 p-2 md:m-4 md:p-4">
+          Password Generator
+        </h1>
+        <Generator
+          password={password}
+          length={length}
+          numberPerm={numberPerm}
+          specialcharPerm={specialcharPerm}
+          setLength={setLength}
+          setNumberPerm={setNumberPerm}
+          setSpecialCharPerm={setSpecialCharPerm}
+        />
+        <PasswordEvaluation password={password} />
+      </div>
+      <div className="w-full md:w-1/3 mt-4 md:mt-0">
+        <SecurityTips />
+      </div>
     </div>
   );
 }

@@ -21,18 +21,21 @@ const Button = ({ onClick, isGenerating }) => {
   const [text, setText] = useState(TARGET_TEXT);
   const [currentTip, setCurrentTip] = useState(0);
   const [triggerScramble, setTriggerScramble] = useState(false);
+
   useEffect(() => {
     const tipInterval = setInterval(() => {
       setCurrentTip((prevTip) => (prevTip + 1) % tips.length);
     }, 5000); // Change tip every 5 seconds
 
     return () => clearInterval(tipInterval);
-  }, [tips.length]);
+  }, []);
+
   useEffect(() => {
     if (triggerScramble) {
       scramble();
     }
   }, [triggerScramble]);
+
   const scramble = () => {
     let pos = 0;
     intervalRef.current = setInterval(() => {
@@ -68,8 +71,8 @@ const Button = ({ onClick, isGenerating }) => {
         whileTap={{
           scale: 0.975,
         }}
-        onMouseEnter={scramble}
-        onMouseLeave={stopScramble}
+        onMouseEnter={() => setTriggerScramble(true)}
+        onMouseLeave={() => setTriggerScramble(false)}
         onClick={onClick}
         className={`relative overflow-hidden rounded-lg border-[1px] border-emerald-500 bg-emerald-600 px-4 py-2 font-mono font-medium uppercase text-neutral-100 transition-colors hover:bg-emerald-700 ${
           isGenerating ? "opacity-50 cursor-not-allowed" : ""

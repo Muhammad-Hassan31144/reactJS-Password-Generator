@@ -73,6 +73,8 @@ const Button = ({ onClick, isGenerating }) => {
         }}
         onMouseEnter={() => setTriggerScramble(true)}
         onMouseLeave={() => setTriggerScramble(false)}
+        onTouchStart={() => setTriggerScramble(true)}
+        onTouchEnd={() => setTriggerScramble(false)}
         onClick={onClick}
         className={`relative overflow-hidden rounded-lg border-[1px] border-emerald-500 bg-emerald-600 px-4 py-2 font-mono font-medium uppercase text-neutral-100 transition-colors hover:bg-emerald-700 ${
           isGenerating ? "opacity-50 cursor-not-allowed" : ""

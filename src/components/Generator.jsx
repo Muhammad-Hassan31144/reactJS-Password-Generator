@@ -1,165 +1,256 @@
-/* eslint-disable react/prop-types */
-import { useCallback, useRef, useState, useEffect } from "react";
-import Button from "./Button";
-
-const PasswordLengthSlider = ({ length, setLength }) => {
-  const percentage = ((length - 8) / (32 - 8)) * 100;
-
-  const bgColor = `linear-gradient(90deg, #48BB78 ${percentage}%, #2D3748 ${percentage}%)`;
-
-  return (
-    <div className="mt-2">
-      <input
-        id="inputRange"
-        type="range"
-        min={8}
-        max={window.innerWidth < 700 ? 20 : 32}
-        value={length}
-        onChange={(e) => setLength(parseInt(e.target.value, 10))}
-        className="w-full h-2 rounded-full outline-none"
-        style={{ background: bgColor }}
-      />
-      <label
-        htmlFor="inputRange"
-        className="text-md font-bold text-green-200 block mt-2"
-      >
-        Length : {length}
-      </label>
-    </div>
-  );
-};
-
-const evaluatePasswordStrength = (password) => {
-  const lengthCriteria = password.length >= 12;
-  const numberCriteria = /\d/.test(password);
-  const specialCharCriteria = /[~`!@#$%^&*()-_+=\[\]{}|?":;/><.,']/.test(password);
-  const uppercaseCriteria = /[A-Z]/.test(password);
-  const lowercaseCriteria = /[a-z]/.test(password);
-  const varietyCriteria = [numberCriteria, specialCharCriteria, uppercaseCriteria, lowercaseCriteria].filter(Boolean).length >= 3;
-
-  // Check for common patterns (repeated characters, sequences)
-  const patternsCriteria = !/(.)\1{2,}|(?:012|123|234|345|456|567|678|789|890|098|987|876|765|654|543|432|321|210)/.test(password);
-
-  // Example of checking against known breached passwords (you should implement an API call for a real check)
-  const breachedPasswords = ["123456", "password", "12345678", "qwerty", "123456789", "12345", "1234", "111111", "1234567", "dragon"];
-  const breachCriteria = !breachedPasswords.includes(password);
-
-  const criteriaMet = [lengthCriteria, varietyCriteria, patternsCriteria, breachCriteria].filter(Boolean).length;
-  const maxCriteria = 4; // Adjust based on the number of criteria
-
-  return criteriaMet / maxCriteria;
-};
-
-const PasswordEvaluation = ({ password }) => {
-  const [strength, setStrength] = useState(0);
-  const strengthText = ["Very Weak", "Weak", "Fair", "Good", "Strong", "Very Strong"];
-
-  useEffect(() => {
-    const strengthValue = evaluatePasswordStrength(password);
-    setStrength(strengthValue);
-  }, [password]);
-
-  return (
-    <div className="bg-yellow-200 p-2 rounded-lg mt-2 w-full">
-      <div className="flex justify-between">
-      <h2 className="text-sm font-bold text-yellow-700 mb-1">Password Strength</h2>
-      <div className="text-sm text-yellow-600">{strengthText[Math.round(strength * 5)]}</div>
-      </div>
-      <div className="w-full bg-gray-300 h-2 rounded-full mt-1">
-        <div
-          className={`h-2 rounded-full ${
-            strength === 0.2 ? "bg-red-500" : strength === 0.4 ? "bg-orange-500" : strength === 0.6 ? "bg-yellow-500" : strength === 0.8 ? "bg-green-500" : "bg-green-700"
-          }`}
-          style={{ width: `${strength * 100}%` }}
-        />
-      </div>
-    </div>
-  );
-};
+// components/Generator.js
+import { useState, useEffect } from "react";
+import { Copy, RefreshCcw, Check, Save, Download, Share } from "lucide-react";
 
 const Generator = ({
   password,
   length,
   numberPerm,
-  specialCharPerm,
+  specialcharPerm,
+  uppercasePerm,
+  lowercasePerm,
+  avoidAmbiguous,
   setLength,
   setNumberPerm,
   setSpecialCharPerm,
+  setUppercasePerm,
+  setLowercasePerm,
+  setAvoidAmbiguous,
   isGenerating,
   handleGeneratePassword,
+  copyToClipboard
 }) => {
-  const passwordRef = useRef(null);
-  const copyPasstoClipboard = useCallback(() => {
-    passwordRef.current?.select();
-    passwordRef.current?.setSelectionRange(0, 30);
-    window.navigator.clipboard.writeText(password);
-  }, [password]);
-
+  const [copied, setCopied] = useState(false);
+  
+  // Handle copy button click
+  const handleCopy = async () => {
+    if (!password) return;
+    
+    await copyToClipboard();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  
+  // Save password as text file
+  const saveAsFile = () => {
+    if (!password) return;
+    
+    const blob = new Blob([password], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `password-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  
+  // Handle sharing (if supported)
+  const sharePassword = async () => {
+    if (!password || !navigator.share) return;
+    
+    try {
+      await navigator.share({
+        title: 'Secure Password',
+        text: 'Here is your secure password:',
+        url: window.location.href
+      });
+    } catch (error) {
+      console.log('Error sharing:', error);
+    }
+  };
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "Secure Password Generator";
+  }, []);
+  
   return (
-    <div className="bg-emerald-700 flex flex-col justify-center items-center p-4 w-full sm:w-10/12 md:w-8/12 lg:w-6/12">
-      <div className="bg-emerald-700 w-full">
-        <div className="rounded-lg bg-gray-200 p-2 w-full mb-4">
-          <div className="flex">
-            <input
-              type="text"
-              value={password}
-              readOnly
-              className="w-full rounded-l-lg bg-white pl-2 text-base font-semibold outline-0"
-              ref={passwordRef}
-            />
-            <button
-              onClick={copyPasstoClipboard}
-              className="bg-blue-500 p-2 rounded-r-lg text-white font-semibold hover:bg-blue-800 transition-colors"
-            >
-              Copy
-            </button>
-          </div>
+    <div className="w-full p-4 bg-white rounded-lg shadow-md">
+      <h3 className="text-lg font-medium mb-4">Generate Secure Password</h3>
+      
+      {/* Password Output Field */}
+      <div className="relative mb-6">
+        <input
+          type="text"
+          className="w-full py-3 px-4 bg-gray-100 border border-gray-300 rounded-lg font-mono text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={password}
+          placeholder="Your secure password will appear here"
+          readOnly
+        />
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
+          {password && (
+            <>
+              <button
+                onClick={handleCopy}
+                className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                title="Copy to clipboard"
+              >
+                {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+              </button>
+              <button
+                onClick={saveAsFile}
+                className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                title="Save as file"
+              >
+                <Download size={18} />
+              </button>
+              {navigator.share && (
+                <button
+                  onClick={sharePassword}
+                  className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  title="Share"
+                >
+                  <Share size={18} />
+                </button>
+              )}
+            </>
+          )}
         </div>
-        <div className="w-full mb-4">
-          <PasswordLengthSlider length={length} setLength={setLength} />
-        </div>
-        <div className="flex flex-col w-full">
-          <div className="flex my-1 items-center justify-between">
-            <label
-              className="text-md font-bold text-green-200 mr-1"
-              htmlFor="number"
-            >
-              Add Numbers
-            </label>
-            <input
-              className="w-8 h-8"
-              type="checkbox"
-              defaultChecked={numberPerm}
-              name="NumberAddition"
-              id="number"
-              onClick={() => {
-                setNumberPerm((prev) => !prev);
-              }}
-            />
-          </div>
-
-          <div className="flex my-1 items-center justify-between">
-            <label
-              className="text-md font-bold text-green-200 mr-1"
-              htmlFor="specialChar"
-            >
-              Add Special Characters
-            </label>
-            <input
-              className="w-8 h-8"
-              type="checkbox"
-              name="specialcharacter"
-              id="specialChar"
-              defaultChecked={specialCharPerm}
-              onClick={() => {
-                setSpecialCharPerm((prev) => !prev);
-              }}
-            />
-          </div>
-        </div>
-        <Button onClick={handleGeneratePassword} isGenerating={isGenerating} />
-        {password && <PasswordEvaluation password={password} />}
       </div>
+      
+      {/* Password Options */}
+      <div className="mb-6 space-y-4">
+        {/* Password Length */}
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label htmlFor="length" className="text-sm font-medium">
+              Length: {length} characters
+            </label>
+            <input
+              type="number"
+              id="length-number"
+              min="6"
+              max="128"
+              value={length}
+              onChange={e => setLength(parseInt(e.target.value) || 12)}
+              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
+            />
+          </div>
+          <input
+            type="range"
+            id="length"
+            min="6"
+            max="64"
+            value={length}
+            onChange={e => setLength(parseInt(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          />
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>6</span>
+            <span>16</span>
+            <span>32</span>
+            <span>48</span>
+            <span>64</span>
+          </div>
+        </div>
+        
+        {/* Character Types */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="uppercase"
+              checked={uppercasePerm}
+              onChange={() => setUppercasePerm(!uppercasePerm)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="uppercase" className="ml-2 text-sm font-medium text-gray-700">
+              Include Uppercase (A-Z)
+            </label>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="lowercase"
+              checked={lowercasePerm}
+              onChange={() => setLowercasePerm(!lowercasePerm)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="lowercase" className="ml-2 text-sm font-medium text-gray-700">
+              Include Lowercase (a-z)
+            </label>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="numbers"
+              checked={numberPerm}
+              onChange={() => setNumberPerm(!numberPerm)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="numbers" className="ml-2 text-sm font-medium text-gray-700">
+              Include Numbers (0-9)
+            </label>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="special"
+              checked={specialcharPerm}
+              onChange={() => setSpecialCharPerm(!specialcharPerm)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="special" className="ml-2 text-sm font-medium text-gray-700">
+              Include Special Characters (!@#$)
+            </label>
+          </div>
+          
+          <div className="flex items-center md:col-span-2">
+            <input
+              type="checkbox"
+              id="ambiguous"
+              checked={avoidAmbiguous}
+              onChange={() => setAvoidAmbiguous(!avoidAmbiguous)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="ambiguous" className="ml-2 text-sm font-medium text-gray-700">
+              Avoid Ambiguous Characters (Il1O0)
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      {/* Generate Button */}
+      <button
+        onClick={handleGeneratePassword}
+        disabled={isGenerating || (!uppercasePerm && !lowercasePerm && !numberPerm && !specialcharPerm)}
+        className={`w-full py-3 px-4 flex items-center justify-center gap-2 rounded-lg text-white font-medium transition ${
+          isGenerating || (!uppercasePerm && !lowercasePerm && !numberPerm && !specialcharPerm)
+            ? 'bg-blue-400 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        {isGenerating ? (
+          <>
+            <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Generating...
+          </>
+        ) : (
+          <>
+            <RefreshCcw size={20} />
+            Generate Secure Password
+          </>
+        )}
+      </button>
+      
+      {/* Password Validation Errors */}
+      {(!uppercasePerm && !lowercasePerm && !numberPerm && !specialcharPerm) && (
+        <p className="text-red-500 text-sm mt-2">
+          Please select at least one character type.
+        </p>
+      )}
     </div>
   );
 };

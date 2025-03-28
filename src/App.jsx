@@ -6,7 +6,7 @@ import Header from "./components/Header";
 import TitleChange from "./components/TitleChange";
 import PasswordStrengthMeter from "./components/PasswordStrengthMeter";
 import PasswordHistory from "./components/PasswordHistory";
-import ConfigPanel from "./components/ConfigPanel";
+// import ConfigPanel from "./components/ConfigPanel";
 import { savePasswordToAPI, validatePasswordAgainstPolicy } from "./services/api";
 import { encryptData } from "./utils/encryption";
 import { usePasswordPolicy } from "./hooks/usePasswordPolicy";
@@ -26,15 +26,15 @@ function App() {
   const [avoidAmbiguous, setAvoidAmbiguous] = useState(false); // New option
   
   // Security and compliance
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [enforcePolicy, setEnforcePolicy] = useState(true);
-  const { policySettings, policyEnabled, setPolicyEnabled } = usePasswordPolicy();
+  // const [passwordStrength, setPasswordStrength] = useState(0);
+  // const [enforcePolicy, setEnforcePolicy] = useState(true);
+  // const { policySettings, policyEnabled, setPolicyEnabled } = usePasswordPolicy();
   
   // Enterprise integration
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
-  const [enterpriseMode, setEnterpriseMode] = useState(false);
-  const [apiEndpoint, setApiEndpoint] = useState("");
-  const [apiKey, setApiKey] = useState("");
+  // const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+  // const [enterpriseMode, setEnterpriseMode] = useState(false);
+  // const [apiEndpoint, setApiEndpoint] = useState("");
+  // const [apiKey, setApiKey] = useState("");
 
   // Update document title when component mounts
   useEffect(() => {
@@ -284,7 +284,7 @@ function App() {
           setPasswordStrength={setPasswordStrength} 
         />
         
-        {enterpriseMode && (
+{/*         {enterpriseMode && (
           <ConfigPanel 
             enforcePolicy={enforcePolicy}
             setEnforcePolicy={setEnforcePolicy}
@@ -298,7 +298,7 @@ function App() {
             autoSaveEnabled={autoSaveEnabled}
             setAutoSaveEnabled={setAutoSaveEnabled}
           />
-        )}
+        )} */}
         
         <PasswordHistory 
           passwordHistory={passwordHistory}
